@@ -1,0 +1,36 @@
+## IDF Component Manager manifest
+## Deps are fetched into ./managed_components on the first `idf.py build`.
+dependencies:
+  idf: ">=5.5.3"   # required by kampi/esp32-lepton 0.0.3
+
+  # FLIR Lepton CCI + VoSPI driver: VENDORED at components/esp32-lepton, not
+  # fetched as a managed dependency here. The published 0.0.3 package
+  # doesn't build on modern ESP-IDF as-is (pre-v4 register_component() style
+  # CMakeLists.txt, plus driver/freertos declared as private requirements
+  # when its own public headers need them) -- see
+  # components/esp32-lepton/CMakeLists.txt for the fixed version and full
+  # explanation. C++ component -- see main.cpp for the required I2C HAL glue
+  # functions it calls back into. Pins configured via sdkconfig, not code --
+  # see sdkconfig.defaults (CONFIG_LEPTON_VOSPI_*). GPL-3.0 licensed.
+
+  # esp-dsp: needed by the vendored component (CRC checking); its own
+  # manifest doesn't declare it either, a separate packaging gap upstream.
+  espressif/esp-dsp: "*"
+
+  # cJSON: parses /sdcard/wifi.json (wifi_setup.cpp). Not bundled in-tree on
+  # this IDF version (moved out of ESP-IDF core into idf-extra-components at
+  # some point) -- fetched as a managed component instead.
+  espressif/cjson: "^1.7.19"
+
+  # --- display/touch ---
+  # esp_lcd_axs15231b 1.0.x does NOT build on ESP-IDF 6 (uses the removed
+  # panel_dev_config->color_space). Use 2.x. Its QSPI RASET regression
+  # (github.com/espressif/esp-bsp/issues/724) only affects partial updates —
+  # our init table sets the CASET/RASET window explicitly and we run LVGL in
+  # full_refresh, so every frame is a full-window write.
+  espressif/esp_lcd_axs15231b: "^2.1.0"
+  lvgl/lvgl: "9.3.0"
+  espressif/esp_lvgl_port: "^2.6.0"
+
+  # Capacitive touch controller (AXS15231B, I2C) — same chip as the display.
+  espressif/esp_lcd_touch: "^1.1.2"

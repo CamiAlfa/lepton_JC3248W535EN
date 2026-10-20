@@ -1,0 +1,40 @@
+# ---------------------------------------------------------------------------
+# Target: ESP32-S3-WROOM-1 N16R8 (16 MB flash, 8 MB octal PSRAM)
+# Board:  Guition JC3248W535C  (3.5" 320x480, AXS15231B QSPI, cap. touch)
+# ---------------------------------------------------------------------------
+CONFIG_IDF_TARGET="esp32s3"
+
+# --- Flash ---
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+
+# --- PSRAM (octal / OPI) ---
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_FETCH_INSTRUCTIONS=y
+CONFIG_SPIRAM_RODATA=y
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+
+# --- CPU / RTOS ---
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=6144
+
+# --- Partition table (room to grow for the Lepton work) ---
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# --- LVGL (unused while display is deactivated, kept for when it's back) ---
+CONFIG_LV_COLOR_DEPTH_16=y
+CONFIG_LV_FONT_MONTSERRAT_14=y
+CONFIG_LV_FONT_MONTSERRAT_28=y
+
+# --- ESP32-Lepton (kampi/esp32-lepton) VoSPI pins ---
+# Matches the wiring from earlier hand-rolled bring-up. SPI3_HOST so it
+# doesn't collide with the display's SPI2_HOST QSPI bus once reactivated.
+CONFIG_LEPTON_VOSPI_SPI3_HOST=y
+CONFIG_LEPTON_VOSPI_CS=6
+CONFIG_LEPTON_VOSPI_SCK=15
+CONFIG_LEPTON_VOSPI_MISO=46

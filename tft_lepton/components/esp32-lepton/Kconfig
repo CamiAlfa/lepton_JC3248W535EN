@@ -1,0 +1,105 @@
+menu "ESP32-Lepton"
+    menu "GPIO"
+        menu "V-Sync"
+            config LEPTON_GPIO_USE_VSYNC
+                bool "Use V-Sync"
+                default n
+
+            config LEPTON_GPIO_VSYNC_PIN
+                depends on LEPTON_GPIO_USE_VSYNC
+                int "V-Sync pin"
+                range 0 48
+
+            config LEPTON_VSYNC_PLACE_IRAM
+                depends on LEPTON_GPIO_USE_VSYNC
+                bool "Place the V-Sync ISR in the IRAM"
+                default y
+        endmenu
+
+        menu "Reset"
+            config LEPTON_GPIO_RESET_PIN
+                int "Reset pin"
+                range -1 48
+                default -1
+        endmenu
+
+        menu "Power-Down"
+            config LEPTON_GPIO_PWR_PIN
+                int "Power-Down pin"
+                range -1 48
+                default -1
+        endmenu
+    endmenu
+
+    menu "VoSPI"
+        choice
+            prompt "VoSPI Bus"
+            default LEPTON_VOSPI_SPI2_HOST
+            help
+                Select the SPI Bus the Lepton VoSPI is attached to.
+
+            config LEPTON_VOSPI_SPI2_HOST
+                bool "SPI2_HOST"
+            config LEPTON_VOSPI_SPI3_HOST
+                bool "SPI3_HOST"
+        endchoice
+
+        config LEPTON_VOSPI_MISO
+            int "MISO pin number"
+            range 0 48
+            default 41
+
+        config LEPTON_VOSPI_SCK
+            int "SCK pin number"
+            range 0 48
+            default 42
+
+        config LEPTON_VOSPI_CS
+            int "CS pin number"
+            range -1 48
+            default 19
+
+        config LEPTON_VOSPI_FRAME_BUFFERS
+            int "Number of image buffers"
+            range 1 8
+            default 2
+            help
+                Number of image buffers.
+    endmenu
+
+    menu "Capture Task"
+        config LEPTON_CAPTURE_TASK_CORE_AFFINITY
+            bool "Use core affinity"
+            default y
+            help
+                Enable this option if you want to use a specific core for the driver.
+
+        config LEPTON_CAPTURE_TASK_CORE
+            depends on LEPTON_CAPTURE_TASK_CORE_AFFINITY
+            int "Core used for the capture task"
+            range 0 1 if SOC_CPU_CORES_NUM > 1
+            default 1
+            help
+                Use a specific core for the capture task.
+
+        config LEPTON_CAPTURE_TASK_STACK
+            int "Stack size for the capture task"
+            range 2048 16384
+            default 4096
+            help
+                Stack size of the capture task.
+
+        config LEPTON_CAPTURE_TASK_PRIORITY
+            int "Priority for the capture task"
+            range 0 31
+            default 16
+            help
+                Capture task priority.
+    endmenu
+
+    menu "Misc"
+        config LEPTON_MISC_ERROR_BASE
+            hex "Lepton driver error base code definition"
+            default 0xB000     
+    endmenu
+endmenu
